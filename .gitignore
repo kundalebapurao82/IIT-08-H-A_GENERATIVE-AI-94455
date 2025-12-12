@@ -4,3 +4,5 @@ __pycache__/
 *.pyo
 
 my_venv1/
+
+.env/
