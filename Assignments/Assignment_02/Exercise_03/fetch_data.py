@@ -1,7 +1,13 @@
+import os
+from dotenv import load_dotenv
 import requests
 
+
+load_dotenv()
+
+API = os.getenv("API")
 def fetch_weather(city):
-    API = "68bef57cb765a7ab1784588b62ceb4dd"
+    
 
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}&units=metric"
 
@@ -33,4 +39,4 @@ def fetch_weather(city):
     with open("weather_report.txt","w") as file:
         file.write(report)
 
-fetch_weather("Pune")
+fetch_weather("Sangli")

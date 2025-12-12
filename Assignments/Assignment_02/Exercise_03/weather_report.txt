@@ -1,7 +1,7 @@
 ==============weather report=============
-City : Pune
-Temperature: 24.11
-Humidity : 32
-Pressure: 1016
+City : Sangli
+Temperature: 27.54
+Humidity : 14
+Pressure: 1014
 Weather : Clear (clear sky)
-Wind speed: 3.86
+Wind speed: 4.47
