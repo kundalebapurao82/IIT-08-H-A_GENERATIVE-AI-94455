@@ -1,0 +1,7 @@
+==============weather report=============
+City : Pune
+Temperature: 24.11
+Humidity : 32
+Pressure: 1016
+Weather : Clear (clear sky)
+Wind speed: 3.86
