@@ -6,3 +6,6 @@ __pycache__/
 my_venv1/
 
 .env/
+
+userfiles.csv
+Users.csv
