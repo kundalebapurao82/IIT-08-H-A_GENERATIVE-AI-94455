@@ -1,0 +1,1 @@
+print("Hello , Welcome to Generative AI Course")
