@@ -5,7 +5,7 @@ __pycache__/
 
 my_venv1/
 
-.env/
+.env
 
 userfiles.csv
 Users.csv
