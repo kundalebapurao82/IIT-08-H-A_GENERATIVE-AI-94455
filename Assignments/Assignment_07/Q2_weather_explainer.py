@@ -52,6 +52,7 @@ def main_page():
 
         if response.status_code != 200:
             s.write("Error:", data.get("message", "Unable to fetch data"))
+            
             s.rerun()
 
         # s.write(f"\nCity : {data['name']}\n")
