@@ -1,12 +1,17 @@
 import streamlit as s
 from langchain_community.document_loaders import PyPDFLoader
+from langchain.chat_models import init_chat_model
 from langchain.embeddings import init_embeddings
 import chromadb
 import os
 import tempfile
 from pathlib import Path
 from dotenv import load_dotenv
+import json
 load_dotenv()
+
+
+qroq_api_key = os.getenv("GROQ_API_KEY")
 
 
 if "view" not in s.session_state:
@@ -41,6 +46,15 @@ embed_model = init_embeddings(
 # s.session_state.embed_model = embed_model
 
 
+# Initialize llm
+llm = init_chat_model(
+     model = "llama-3.3-70b-versatile",
+     model_provider = "openai",
+     base_url = "https://api.groq.com/openai/v1",
+     api_key = qroq_api_key
+)
+
+
 
 # view definitions
 
@@ -50,6 +64,7 @@ def home():
     s.markdown("Please select your prefered option from sidebar")
 
 
+# Shortlist window
 def shortlist_window():
     s.header("Welcome to resume shortlisting")
 
@@ -63,14 +78,65 @@ def shortlist_window():
 
         # similarity search
         # get top 4 results with similarity to given query_embedding
-        results = collection.query( query_embeddings = [query_embedding], n_results = 2)
+        results = collection.query( query_embeddings = [query_embedding], n_results = 3)
+
+
+        # prompt for llm
+        explanation_input = f"""
+                You are an AI HR Assistant with 10+ years of recruitment experience.
+                Your role is STRICTLY LIMITED to recruitment and resume shortlisting tasks.
+
+                ========================
+                IMPORTANT RULES (MUST FOLLOW)
+                1. ONLY answer recruitment or HR-related queries.
+                2. If the query is NOT related to: hiring, recruitment, resume shortlisting, candidate selection, skills, experience, job roles
+                then DO NOT analyze resumes.
+                3. DO NOT provide general knowledge answers.
+                4. DO NOT add explanations, assumptions, or extra text.
+
+                If the query is NOT a recruitment or HR-related question, respond with EXACTLY this sentence and NOTHING ELSE:
+                "Please ask a recruitment or HR-like question."
+
+                ========================
+                VALID HR QUERY BEHAVIOR
+                If the query IS a valid recruitment question:
+                - You will receive the TOP 3 applicant resumes.
+                - Analyze ONLY the provided resumes.
+                - Select ONLY the top 1 or top 2 most suitable candidates.
+                - Use ONLY the information present in the resumes.
+                - Do NOT hallucinate or add missing details.
+
+                ========================
+                OUTPUT:
+                If HR query is VALID give
+                Selected Applicant(s) information including Name,Email, Mobile Number,Skills, Experience, Resume ID, Resume Path, Resume Metadata
+                in structured format.
+
+                Why Selected:
+                -clear justification based ONLY on skills and experience.
+                Why Not Selected:
+                - reason for each non-selected applicant.
+
+                ========================
+                INPUT DATA
+                HR Query:{HR_query}
+                Top Applicant Resumes (JSON):{json.dumps(results)}
+
+                """
+        result = llm.invoke(explanation_input)
+        explanation_output = result.content.strip()
+        # s.subheader("Assistant")
+        
 
         s.markdown("Results: ")
-        for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
-            s.markdown("Metadata:")
-            s.markdown(meta)
-            s.markdown("Document:")
-            s.markdown(doc)
+        s.write(explanation_output)
+        # for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+        #     s.markdown("Metadata:")
+        #     s.markdown(meta)
+        #     s.markdown("Document:")
+        #     s.markdown(doc)
+
+
 
 
 def load_pdf_resume(pdf_path, resume_id):
