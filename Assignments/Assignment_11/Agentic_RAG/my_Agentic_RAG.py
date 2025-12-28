@@ -16,7 +16,7 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 
 @tool
-def get_top_resumes(query: str) -> str:
+def get_top_resumes(query):
     """Return top 3 resumes in JSON format for a given HR query"""
     query_embedding = embed_model.embed_query(query)
     results = collection.query(query_embeddings=[query_embedding], n_results=3)
@@ -111,7 +111,8 @@ def shortlist_window():
         HR Query: {HR_query}
 
         Use ONLY the information from top resumes returned by the tool.
-        Provide output in structured format: Selected Applicant(s), Why Selected, Why Not Selected.
+        Provide output in structured format: Selected Applicant(s) information including name, email, mobile number,
+         skills, experience, etc and  Why Selected, Why Not Selected.
         """
 
         # Run agent
